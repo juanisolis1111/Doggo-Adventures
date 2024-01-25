@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+
+    <title>Doggo Adventures!</title>
+  </head>
+  <body>
+    <div id="menu">
+      <img src="assets/Dog2.png" alt="strayDog" id="strayDog" />
+      <h1>Welcome to the Doggo Adventures!</h1>
+      <button id="startButton" onclick="playGame()">Start Game</button>
+      <div id="controls">
+        <p>Use the following arrow keys to move:</p>
+        <p>↑ (Up Arrow) - Move Up</p>
+        <p>← (Left Arrow) - Move Left</p>
+        <p>→ (Right Arrow) - Move Right</p>
+        <p>↓ (Down Arrow) - Move Down</p>
+      </div>
+      <div id="instructions">
+        <p>
+          Go around the neighborhood, gather all the lost stray dogs and guide
+          them to the park safely while avoiding different threats!
+        </p>
+      </div>
+    </div>
+    <div id="game-container">
+      <!-- Score -->
+      <p class="dog-score-p">Score</p>
+      <p class="dog-score">0</p>
+      <!-- Canvas, the Game -->
+      <canvas id="dogGame" width="600" height="600"> </canvas>
+    </div>
+    <!-- Game Over Container -->
+    <div id="game-over-container">
+      <h1 class="game-over-title">Game Over</h1>
+      <button class="game-over-play-button" onClick="playGame()">
+        Play Again
+      </button>
+    </div>
+
+    <!-- Game Win Container -->
+    <div id="game-win-container">
+      <h1 class="game-win-title">
+        Congratulations, you saved the stray Dogs from the cold street!
+      </h1>
+      <button class="game-win-play-button" onClick="playGame()">
+        Play Again
+      </button>
+    </div>
+
+    <div id="endScreen">
+      <h2>You and the rest of the pack have become strays again...</h2>
+      <button id="restartButton" onclick="restartGame()">Restart Game</button>
+    </div>
+
+    <script src="index.js"></script>
+  </body>
+</html>
