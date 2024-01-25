@@ -1,257 +1,262 @@
-document.getElementById("game-container").style.display = "none";
-document.getElementById("game-over-container").style.display = "none";
-document.getElementById("game-win-container").style.display = "none";
-
-function hideMenu() {
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("game-over-container").style.display = "none";
-  document.getElementById("game-win-container").style.display = "none";
-}
-
-function hideGame() {
-  document.getElementById("game-container").style.display = "none";
-  document.getElementById("game-over-container").style.display = "block";
-}
-
-function winGame() {
-  document.getElementById("game-container").style.display = "none";
-  document.getElementById("game-win-container").style.display = "block";
-}
-
-let intervalId;
-
-function checkWin(dog) {
-  const dogAndStrayDogs = [dog, ...dog.tail];
-
-  //   // Check if all elements are inside the dog park
-  const allInsideDogPark = dogAndStrayDogs.every((element) => {
-    return (
-      element.x >= 200 && element.x < 400 && element.y >= 200 && element.y < 400
-    );
-  });
-
-  if (allInsideDogPark) {
-    clearInterval(intervalId); // Stop the game loop
-    winGame(); // Win the game
-  }
-}
-
-function playGame() {
-  hideMenu();
-  document.getElementById("game-container").style.display = "block";
-
-  // Draw
-  const canvas = document.querySelector("#dogGame");
-  const ctx = canvas.getContext("2d");
-
-  const scale = 40;
-  const rows = canvas.height / scale;
-  const columns = canvas.width / scale;
-
-  // Setup
-  function setup() {
-    dog = new Dog();
-    strayDog = new StrayDog();
-    strayDog.pickLocation();
-    dogPark = new DogPark();
-    let beat = new Audio(
+class Game {
+  constructor() {
+    this.intervalId = null;
+    this.canvas = document.querySelector("#dogGame");
+    this.ctx = this.canvas.getContext("2d");
+    this.scale = 40;
+    this.rows = this.canvas.height / this.scale;
+    this.columns = this.canvas.width / this.scale;
+    this.dog = new Dog(this);
+    this.strayDog = new StrayDog(this);
+    this.dogPark = new DogPark(this);
+    this.audio = new Audio(
       "./assets/30966_playful-detective-music-sting-soundroll-1-00-34.mp3"
     );
+  }
 
-    intervalId = window.setInterval(() => {
-      checkWin(dog);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      dogPark.draw();
-      strayDog.draw();
-      dog.update();
-      dog.draw();
-      beat.play();
+  start() {
+    this.hideElements([
+      "game-container",
+      "game-over-container",
+      "game-win-container",
+    ]);
+    this.hideMenu();
+    this.showElement("game-container");
+    this.setup();
+  }
 
-      // Picks Up strayDog
-      if (dog.picksUp(strayDog)) {
-        strayDog.pickLocation();
+  setup() {
+    this.intervalId = window.setInterval(() => {
+      this.dog.checkWin();
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.dogPark.draw();
+      this.strayDog.draw();
+      this.dog.update();
+      this.dog.draw();
+      this.audio.play();
+
+      if (this.dog.picksUp(this.strayDog)) {
+        this.strayDog.pickLocation();
       }
 
-      document.querySelector(".dog-score").innerText = dog.total;
-      if (dog.checkCollision()) {
-        hideGame();
-        clearInterval(intervalId); // Clear the interval on collision
+      document.querySelector(".dog-score").innerText = this.dog.total;
+      if (this.dog.checkCollision()) {
+        this.endGame();
       }
     }, 300);
+
+    window.addEventListener("keydown", (evt) => {
+      const direction = evt.key.replace("Arrow", "");
+      this.dog.changeDirection(direction);
+    });
   }
 
-  // Key Listener
-  window.addEventListener("keydown", (evt) => {
-    const direction = evt.key.replace("Arrow", "");
-    dog.changeDirection(direction);
-  });
-
-  // DogPlayer
-  class Dog {
-    constructor() {
-      this.x = 0;
-      this.y = 0;
-      this.xSpeed = scale;
-      this.ySpeed = 0;
-      this.total = 0;
-      this.tail = [];
-      this.collectedStrayDogs = [];
-
-      // Draw DogPlayer
-      this.draw = function () {
-        this.image = new Image();
-        this.image.src = "./assets/Dog2.png";
-
-        for (let i = 0; i < this.collectedStrayDogs.length; i++) {
-          ctx.drawImage(
-            this.collectedStrayDogs[i].image,
-            this.tail[i].x,
-            this.tail[i].y,
-            scale,
-            scale
-          );
-        }
-
-        ctx.drawImage(this.image, this.x, this.y, scale, scale);
-      };
-      console.log("total", this.total);
-      // Update Collected Dog
-      this.update = function () {
-        for (let i = 0; i < this.tail.length - 1; i++) {
-          this.tail[i] = this.tail[i + 1];
-        }
-        // Update Newly Pcikedup  Dog
-        this.tail[this.total - 1] = { x: this.x, y: this.y };
-        // Update Head  Dog
-        this.x += this.xSpeed;
-        this.y += this.ySpeed;
-
-        if (this.x > canvas.width) {
-          this.total = 0;
-          this.tail = [];
-          this.x = 0;
-          this.y = 0;
-          this.x += this.xSpeed;
-          hideGame();
-        }
-        if (this.y > canvas.height) {
-          this.total = 0;
-          this.tail = [];
-          this.x = 0;
-          this.y = 0;
-          this.x += this.xSpeed;
-          hideGame();
-        }
-        if (this.x < 0) {
-          this.total = 0;
-          this.tail = [];
-          this.x = 0;
-          this.y = 0;
-          this.x += this.xSpeed;
-          hideGame();
-        }
-        if (this.y < 0) {
-          this.total = 0;
-          this.tail = [];
-          this.x = 0;
-          this.y = 0;
-          this.x += this.xSpeed;
-          hideGame();
-        }
-      };
-      // Change Direction
-      this.changeDirection = function (direction) {
-        switch (direction) {
-          case "Up":
-            this.xSpeed = 0;
-            this.ySpeed = -scale;
-            break;
-          case "Down":
-            this.xSpeed = 0;
-            this.ySpeed = scale;
-            break;
-          case "Left":
-            this.xSpeed = -scale;
-            this.ySpeed = 0;
-            break;
-          case "Right":
-            this.xSpeed = scale;
-            this.ySpeed = 0;
-            break;
-        }
-      };
-      // Picks Up strayDog
-      this.picksUp = function (strayDog) {
-        if (this.x === strayDog.x && this.y === strayDog.y) {
-          //Declare stray dog and add to collectedStrayDogs
-          const newStrayDog = new StrayDog();
-          newStrayDog.x = strayDog.x;
-          newStrayDog.y = strayDog.y;
-          newStrayDog.image.src = strayDog.image.src; // Copy the image source
-          this.collectedStrayDogs.push(newStrayDog);
-          this.total++;
-          return true;
-        }
-      };
-
-      // Check Collision
-      this.checkCollision = function () {
-        for (let i = 0; i < this.tail.length; i++) {
-          if (this.x === this.tail[i].x && this.y === this.tail[i].y) {
-            this.total = 0;
-            this.tail = [];
-            this.x = 0;
-            this.y = 0;
-            hideGame();
-          }
-        }
-      };
-    }
+  hideMenu() {
+    this.hideElements(["menu", "game-over-container", "game-win-container"]);
   }
 
-  // Stray Dog
-  class StrayDog {
-    constructor() {
-      this.x;
-      this.y;
-      this.images = [
-        "./assets/Dog1.png",
-        "./assets/Dog2.png",
-        "./assets/Dog3.png",
-        "./assets/Dog4.png",
-      ];
-      this.image = new Image();
-      this.pickLocation();
-    }
-
-    draw() {
-      ctx.drawImage(this.image, this.x, this.y, scale, scale);
-    }
-
-    pickLocation() {
-      const randomIndex = Math.floor(Math.random() * this.images.length);
-      this.image = new Image(); // Create a new Image object
-      this.image.src = this.images[randomIndex];
-
-      //Pick location outside dog park
-      do {
-        this.x = Math.floor(Math.random() * rows) * scale;
-        this.y = Math.floor(Math.random() * columns) * scale;
-      } while (this.x >= 200 && this.x < 400 && this.y >= 200 && this.y < 400);
-    }
+  hideGame() {
+    this.hideElements(["game-container"]);
+    this.showElement("game-over-container");
   }
 
-  class DogPark {
-    constructor() {
-      this.image = new Image();
-      this.image.src = "./assets/Field.png";
-    }
-
-    draw() {
-      ctx.drawImage(this.image, 200, 200, 200, 200);
-    }
+  winGame() {
+    this.hideElements(["game-container"]);
+    this.showElement("game-win-container");
   }
 
-  // Initial setup
-  setup();
+  hideElements(ids) {
+    ids.forEach((id) => {
+      document.getElementById(id).style.display = "none";
+    });
+  }
+
+  showElement(id) {
+    document.getElementById(id).style.display = "block";
+  }
+
+  endGame() {
+    clearInterval(this.intervalId);
+    this.hideGame();
+  }
 }
+
+class Dog {
+  constructor(game) {
+    this.game = game;
+    this.x = 0;
+    this.y = 0;
+    this.xSpeed = game.scale;
+    this.ySpeed = 0;
+    this.total = 0;
+    this.tail = [];
+    this.collectedStrayDogs = [];
+    this.image = new Image();
+    this.image.src = "./assets/Dog2.png";
+  }
+
+  draw() {
+    for (let i = 0; i < this.collectedStrayDogs.length; i++) {
+      this.game.ctx.drawImage(
+        this.collectedStrayDogs[i].image,
+        this.tail[i].x,
+        this.tail[i].y,
+        this.game.scale,
+        this.game.scale
+      );
+    }
+
+    this.game.ctx.drawImage(
+      this.image,
+      this.x,
+      this.y,
+      this.game.scale,
+      this.game.scale
+    );
+  }
+
+  update() {
+    for (let i = 0; i < this.tail.length - 1; i++) {
+      this.tail[i] = this.tail[i + 1];
+    }
+
+    this.tail[this.total - 1] = { x: this.x, y: this.y };
+
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+
+    if (
+      this.x > this.game.canvas.width ||
+      this.y > this.game.canvas.height ||
+      this.x < 0 ||
+      this.y < 0
+    ) {
+      this.reset();
+      this.game.hideGame();
+    }
+  }
+
+  changeDirection(direction) {
+    switch (direction) {
+      case "Up":
+        this.xSpeed = 0;
+        this.ySpeed = -this.game.scale;
+        break;
+      case "Down":
+        this.xSpeed = 0;
+        this.ySpeed = this.game.scale;
+        break;
+      case "Left":
+        this.xSpeed = -this.game.scale;
+        this.ySpeed = 0;
+        break;
+      case "Right":
+        this.xSpeed = this.game.scale;
+        this.ySpeed = 0;
+        break;
+    }
+  }
+
+  picksUp(strayDog) {
+    if (this.x === strayDog.x && this.y === strayDog.y) {
+      const newStrayDog = new StrayDog(this.game);
+      newStrayDog.x = strayDog.x;
+      newStrayDog.y = strayDog.y;
+      newStrayDog.image.src = strayDog.image.src;
+      this.collectedStrayDogs.push(newStrayDog);
+      this.total++;
+      return true;
+    }
+  }
+
+  checkCollision() {
+    for (let i = 0; i < this.tail.length; i++) {
+      if (this.x === this.tail[i].x && this.y === this.tail[i].y) {
+        this.reset();
+        this.game.hideGame();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  checkWin() {
+    const dogAndStrayDogs = [this, ...this.tail];
+    const allInsideDogPark = dogAndStrayDogs.every((element) => {
+      return (
+        element.x >= 200 &&
+        element.x < 400 &&
+        element.y >= 200 &&
+        element.y < 400
+      );
+    });
+
+    if (allInsideDogPark) {
+      clearInterval(this.game.intervalId);
+      this.game.winGame();
+    }
+  }
+
+  reset() {
+    this.total = 0;
+    this.tail = [];
+    this.x = 0;
+    this.y = 0;
+    this.x += this.xSpeed;
+  }
+}
+
+class StrayDog {
+  constructor(game) {
+    this.game = game;
+    this.x;
+    this.y;
+    this.images = [
+      "./assets/Dog1.png",
+      "./assets/Dog2.png",
+      "./assets/Dog3.png",
+      "./assets/Dog4.png",
+    ];
+    this.image = new Image();
+    this.pickLocation();
+  }
+
+  draw() {
+    this.game.ctx.drawImage(
+      this.image,
+      this.x,
+      this.y,
+      this.game.scale,
+      this.game.scale
+    );
+  }
+
+  pickLocation() {
+    const randomIndex = Math.floor(Math.random() * this.images.length);
+    this.image = new Image();
+    this.image.src = this.images[randomIndex];
+
+    do {
+      this.x = Math.floor(Math.random() * this.game.rows) * this.game.scale;
+      this.y = Math.floor(Math.random() * this.game.columns) * this.game.scale;
+    } while (this.x >= 200 && this.x < 400 && this.y >= 200 && this.y < 400);
+  }
+}
+
+class DogPark {
+  constructor(game) {
+    this.game = game;
+    this.image = new Image();
+    this.image.src = "./assets/Field.png";
+  }
+
+  draw() {
+    this.game.ctx.drawImage(this.image, 200, 200, 200, 200);
+  }
+}
+
+function restartGame() {
+  window.location.reload();
+}
+
+const game = new Game();

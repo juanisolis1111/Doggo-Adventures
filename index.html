@@ -11,7 +11,7 @@
     <div id="menu">
       <img src="assets/Dog2.png" alt="strayDog" id="strayDog" />
       <h1>Welcome to the Doggo Adventures!</h1>
-      <button id="startButton" onclick="playGame()">Start Game</button>
+      <button id="startButton" onclick="game.start()">Start Game</button>
       <div id="controls">
         <p>Use the following arrow keys to move:</p>
         <p>↑ (Up Arrow) - Move Up</p>
@@ -35,8 +35,11 @@
     </div>
     <!-- Game Over Container -->
     <div id="game-over-container">
-      <h1 class="game-over-title">Game Over</h1>
-      <button class="game-over-play-button" onClick="playGame()">
+      <h1 class="game-over-title">
+        Game Over <br />
+        You and the rest of the dogs have become stray again...
+      </h1>
+      <button class="game-over-play-button" onClick="restartGame()">
         Play Again
       </button>
     </div>
@@ -46,14 +49,9 @@
       <h1 class="game-win-title">
         Congratulations, you saved the stray Dogs from the cold street!
       </h1>
-      <button class="game-win-play-button" onClick="playGame()">
+      <button class="game-win-play-button" onClick="restartGame()">
         Play Again
       </button>
-    </div>
-
-    <div id="endScreen">
-      <h2>You and the rest of the pack have become strays again...</h2>
-      <button id="restartButton" onclick="restartGame()">Restart Game</button>
     </div>
 
     <script src="index.js"></script>
