@@ -63,21 +63,6 @@ p {
   margin: 10px 0;
 }
 
-#restartButton {
-  padding: 15px 30px;
-  font-size: 18px;
-  background-color: green;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-#restartButton:hover {
-  background-color: darkgreen;
-}
-
 /* Menu Container */
 #menu-container {
   height: 50px;
@@ -87,15 +72,7 @@ p {
   align-items: center;
   justify-content: center;
 }
-.menu-play-button {
-  font-size: 1.5rem;
-  font-family: "Press Start 2P";
-  background-color: transparent;
-  border: none;
-  color: #fff;
-  text-decoration: underline;
-  cursor: pointer;
-}
+
 /* Game Container */
 #game-container {
   text-align: center;
@@ -130,34 +107,9 @@ p {
   background-color: #585b5a;
   margin: 0 auto;
   align-self: center;
-  order: 1;
   border: 20px solid #d58e5e;
 }
-/* Control Buttons */
-.controls {
-  margin-top: 30px;
-  display: flex;
-  order: 2;
-}
-.control-button {
-  width: 50px;
-  height: 50px;
-  background-color: #d58e5e;
-  margin: 0px auto;
-  color: #9b4637;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: s background-color ease, 0.5s color ease;
-  box-shadow: 0px 5px 0px #9b4637;
-}
-.control-button:hover {
-  background-color: #9b4637;
-  color: #d58e5e;
-}
-.control-button i {
-  margin: 0 auto;
-}
+
 /* Game Over Container */
 
 #game-over-container,
@@ -171,11 +123,16 @@ p {
 }
 .game-over-play-button,
 .game-win-play-button {
-  font-size: 1.5rem;
-  color: #9b4637;
-  font-family: "Press Start 2P";
-  background-color: transparent;
+  padding: 15px 30px;
+  font-size: 18px;
+  background-color: green;
+  color: white;
   border: none;
-  text-decoration: underline;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+.game-over-play-button:hover,
+.game-win-play-button:hover {
+  background-color: darkgreen;
 }
