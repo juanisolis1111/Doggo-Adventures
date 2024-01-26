@@ -19,11 +19,6 @@ class Game {
   // Start the game
   start() {
     // Hide unnecessary elements and display game container
-    this.hideElements([
-      "game-container",
-      "game-over-container",
-      "game-win-container",
-    ]);
     this.hideMenu();
     this.showElement("game-container");
     this.setup();
